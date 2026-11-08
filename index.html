@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f6f3ee">
+<meta name="description" content="A curious conversation with the Cheshire Cat. A small language model runs privately in your browser, with WebGPU or WASM.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2371538c'/%3E%3Ctext x='32' y='47' text-anchor='middle' font-size='48' fill='%23f6f3ee'%3E☾%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&display=swap">
+<title>The Cheshire Room · A curious little conversation</title>
+<style>
+:root{--paper:#f6f3ee;--ink:#302638;--muted:#79717f;--purple:#71538c;--line:#e2dce5;--lavender:#eee7f3;--serif:'Libre Caslon Display',Georgia,serif}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;font-size:14px}button,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid #a888c2;outline-offset:4px}header{height:88px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:0 5vw}.brand{display:flex;align-items:center;gap:13px}.brand-icon{color:var(--purple);font-size:32px}.brand strong{font-family:var(--serif);font-weight:400;font-size:27px}.brand small{display:block;font-size:9px;letter-spacing:2.5px;color:var(--muted);margin-top:3px}.private-badge{font-size:11px;display:flex;gap:8px;align-items:center}.dot{height:6px;width:6px;background:#798c70;border-radius:50%;display:inline-block}.layout{max-width:1360px;margin:auto;display:grid;grid-template-columns:310px minmax(0,1fr);min-height:calc(100dvh - 88px)}aside{padding:42px 32px 32px 24px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:28px}.eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:10px;font-weight:600;color:var(--purple)}h1{font-family:var(--serif);font-size:45px;font-weight:400;line-height:1.05;letter-spacing:-1px;margin:16px 0}aside p{line-height:1.8;color:var(--muted);font-size:12px}.model-card{background:#fffdf9;border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 4px 15px #3e234103}.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:23px}.chip{font-size:9px;letter-spacing:.7px;text-transform:uppercase;border:1px solid #dcd0e5;background:var(--lavender);color:var(--purple);padding:5px 8px;border-radius:5px}.model-name{font-size:16px;font-weight:600;letter-spacing:-.4px}.model-meta{font-size:11px;color:var(--muted);margin-top:7px}.download{border:0;border-radius:8px;background:var(--purple);color:white;width:100%;padding:13px 9px;font-size:12px;margin-top:23px;transition:background .2s}.download:hover{background:#573d70}.download-status{font-size:11px;color:var(--muted);line-height:1.6;margin:10px 0 0;overflow-wrap:anywhere}progress{width:100%;height:6px;accent-color:var(--purple);margin-top:14px;display:block}progress[hidden]{display:none}.local-note{font-size:11px;line-height:1.7;color:var(--muted);margin:14px 0 0}.tiny-heading{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--purple)}.how{padding:0 3px}.how ol{padding:0;list-style:none;counter-reset:steps}.how li{counter-increment:steps;display:flex;align-items:center;gap:11px;font-size:11px;color:var(--muted);margin:15px 0}.how li:before{content:'0' counter(steps);font-size:10px;color:#9985aa}.aside-footer{margin-top:auto;font-family:var(--serif);font-style:italic;font-size:18px;color:#94839f;line-height:1.5}.room{padding:26px 46px 22px;display:flex;flex-direction:column;min-width:0}.room-bar{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase}.room-bar button{background:none;border:0;color:var(--muted);font-size:11px;letter-spacing:0;text-transform:none;padding:8px}.room-bar button:hover{color:var(--purple)}.welcome{text-align:center;padding:20px 0 25px;position:relative}.cat{width:210px;height:150px;display:block;margin:auto;overflow:visible}.welcome .eyebrow{font-size:9px;margin-top:12px}h2{font-family:var(--serif);font-size:60px;letter-spacing:-1.9px;font-weight:400;line-height:1.05;margin:13px 0}.welcome p{color:var(--muted);font-size:12px;line-height:1.8;margin:13px 0 0}.welcome em{color:var(--purple);font-weight:400}.conversation{flex:1;min-height:120px;max-height:340px;overflow:auto;padding:8px 5px 16px;scrollbar-width:thin;scrollbar-color:#d3c7dc transparent}.message{display:flex;gap:12px;margin:14px 0 22px;align-items:flex-start}.avatar{width:30px;height:30px;flex:none;background:var(--lavender);border-radius:50%;color:var(--purple);display:grid;place-items:center;font-size:16px}.message-content{max-width:90%;min-width:0}.speaker{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.1px;margin:2px 0 9px;color:var(--purple)}.bubble{font-size:13px;line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere}.message.user{flex-direction:row-reverse}.user .avatar{background:#e6e8df;color:#65745c;font-size:12px}.user .message-content{background:#eae4ef;padding:12px 17px;border-radius:13px 2px 13px 13px;max-width:80%}.user .speaker{color:#80728a}.suggestions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 20px}.suggestions button{border:1px solid var(--line);background:transparent;color:#766880;border-radius:18px;font-size:10px;padding:9px 12px}.suggestions button:hover{border-color:var(--purple);background:var(--lavender)}.composer{margin-top:auto}.input-box{display:flex;align-items:flex-end;gap:12px;background:#fffdf9;border:1px solid #d9cede;border-radius:12px;padding:13px 13px 13px 18px;box-shadow:0 5px 20px #39233e04}textarea{resize:none;flex:1;min-width:0;line-height:1.6;height:44px;max-height:100px;border:0;background:transparent;outline:none;color:var(--ink);font-size:12px;padding:8px 0}textarea::placeholder{color:#a096a6}.send{width:36px;height:36px;border:0;border-radius:8px;background:var(--purple);color:white;font-size:21px;display:grid;place-items:center}.composer-info{display:flex;justify-content:space-between;font-size:9px;color:#958b9a;margin:10px 2px 0;gap:10px}.status-line{overflow-wrap:anywhere;min-height:19px;font-size:11px;color:var(--purple);padding:6px 2px}.status-line.error{color:#a34452}.footnote{text-align:center;font-size:9px;color:#a299a5;padding-top:15px;letter-spacing:.2px}.welcome.compact{padding:10px 0}.welcome.compact .cat{width:100px;height:70px}.welcome.compact h2{font-size:33px}.welcome.compact p,.welcome.compact .eyebrow{display:none}.welcome.compact+.conversation{max-height:55dvh} @media(min-width:1500px){.layout{padding-top:20px}.welcome{padding-top:40px}.conversation{max-height:450px}}@media(max-width:800px){header{height:72px;padding:0 22px}.brand strong{font-size:23px}.private-badge{font-size:0}.private-badge .dot{width:8px;height:8px}.layout{grid-template-columns:1fr;min-height:calc(100dvh - 72px)}aside{padding:24px;border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:20px}h1{font-size:33px}.model-card{padding:15px}.card-top{margin-bottom:12px}.download{margin-top:15px}.how,.aside-footer{display:none}.room{padding:22px;min-height:600px}h2{font-size:45px}.cat{width:170px;height:120px}.conversation{max-height:400px}}@media(max-width:480px){aside{grid-template-columns:1fr}.intro{display:none}.model-card{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.card-top{grid-column:1/-1;margin-bottom:8px}.download{margin:0;grid-column:2;grid-row:2/4}.model-meta{font-size:10px}.download-status,progress,.local-note{grid-column:1/-1}.local-note{margin-top:10px}.welcome{padding-top:10px}.room{padding:18px}.composer-info{font-size:8px}.suggestions{gap:5px}.suggestions button{font-size:9px}.brand small{font-size:8px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><span class="brand-icon" aria-hidden="true">☾</span><div><strong>The Cheshire Room</strong><small>A CURIOUS LITTLE CONVERSATION</small></div></div><span class="private-badge"><span class="dot"></span> A little wonder. Just on your device.</span></header>
+<div class="layout">
+<aside>
+<div class="intro"><div class="eyebrow">Down the rabbit hole</div><h1>A little curious.<br>Entirely yours.</h1><p>Step out of the ordinary.<br>A certain grinning cat is waiting<br>to turn your thoughts upside down.</p></div>
+<section class="model-card" aria-label="Model download"><div class="card-top"><span class="tiny-heading">Your pocket-sized cat</span><span class="chip">135M · Q4</span></div><div class="model-name">SmolLM2 Instruct</div><div class="model-meta">≈ 200 MB download · 4-bit model</div><button class="download" id="download">↓ &nbsp; Download model</button><progress id="progress" max="100" value="0" hidden aria-label="Model download progress"></progress><div id="download-status" class="download-status" aria-live="polite">Not downloaded yet</div><p class="local-note">Download once, then the model runs entirely on your device. Model files are cached by your browser for next time. Your words stay here.</p></section>
+<div class="how"><span class="tiny-heading">A small bit of magic</span><ol><li>Download your curious companion</li><li>Ask something wonderfully odd</li><li>See where the conversation wanders</li></ol><p>WebGPU when available. WASM otherwise.<br>No account. No chat server.</p></div>
+<div class="aside-footer">“We’re all mad here.”<div style="font:9px 'DM Sans',sans-serif;letter-spacing:1px;margin-top:10px">A LITTLE WONDERLAND SPIRIT</div></div>
+</aside>
+<main class="room">
+<div class="room-bar"><span>Wonderland / The drawing room</span><button id="clear" title="Clear conversation">↺ &nbsp; New chat</button></div>
+<section class="welcome" id="welcome">
+<svg class="cat" viewBox="0 0 260 180" role="img" aria-label="A smiling purple Cheshire Cat floating among stars"><defs><linearGradient id="fur" x2="0" y2="1"><stop stop-color="#ad8fc7"/><stop offset="1" stop-color="#77558f"/></linearGradient><filter id="soft"><feGaussianBlur stdDeviation="5"/></filter></defs><ellipse cx="130" cy="163" rx="62" ry="5" fill="#d2c2df" opacity=".45" filter="url(#soft)"/><g fill="#b5a2c3"><path d="m26 53 2 7 7 2-7 2-2 7-2-7-7-2 7-2z"/><path d="m226 89 2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/><circle cx="210" cy="32" r="2"/><circle cx="42" cy="121" r="2"/><path d="m188 13 1 4 4 1-4 1-1 4-1-4-4-1 4-1z"/></g><path d="M65 85 61 24Q83 29 99 50Q130 37 161 50Q181 27 199 24L195 86Q207 109 187 131Q163 152 130 151Q93 153 72 131Q52 110 65 85Z" fill="url(#fur)"/><path d="m70 38 8 38 15-18zM190 38l-8 38-15-18z" fill="#d2b9db"/><path d="m111 47 7 20 10-23M138 44l8 23 8-20M65 86l25 10-29 5M197 86l-25 10 28 5M66 114l24-3-18 13M194 114l-24-3 18 13" fill="#694481" opacity=".6"/><path d="M85 84q13-16 28 1-16 11-28-1M147 85q15-17 28-1-12 12-28 1" fill="#f3e7b4"/><path d="M100 77v13M160 77v13" stroke="#4a3554" stroke-width="4" stroke-linecap="round"/><path d="m123 98 7 6 7-6q-7-6-14 0" fill="#e4b2ca"/><path d="M82 104Q130 132 178 104Q165 143 130 141Q95 141 82 104" fill="#fbf4e5" stroke="#604174" stroke-width="2"/><path d="M86 112q44 24 88 0M99 114l5 18M115 119l2 20M132 121v20M148 119l-2 20M164 114l-6 19" fill="none" stroke="#b9a6bf" stroke-width="1.3"/><g stroke="#785789" stroke-width="1" opacity=".6"><path d="m88 103-42-9m41 16-45 3m132-10 41-9m-40 16 45 3"/></g></svg>
+<div class="eyebrow">You're in wonderfully odd company</div><h2>We're all <em>curious</em> here.</h2><p>A question, a riddle, a thought without a destination.<br>Whatever brings you here, do come a little closer.</p>
+</section>
+<div class="conversation" id="conversation" role="log" aria-label="Conversation with the Cheshire Cat" aria-live="polite" aria-relevant="additions text"></div>
+<div class="suggestions" id="suggestions"><button data-prompt="Which way ought I to go?">Which way ought I to go? ↗</button><button data-prompt="Tell me a curious riddle.">Tell me a curious riddle ✧</button><button data-prompt="Why is everyone here so odd?">Why is everyone here so odd? ☾</button></div>
+<form class="composer" id="chat-form"><div class="input-box"><textarea id="prompt" maxlength="400" rows="2" aria-label="Message the Cheshire Cat" placeholder="First, download the cat. Then, follow your curiosity…" disabled></textarea><button class="send" id="send" aria-label="Send message" disabled>↑</button></div><div class="composer-info"><span id="device">PRIVATE BY DESIGN · RUNS IN YOUR BROWSER</span><span>Enter to send · Shift + Enter for a new line</span></div><div class="status-line" id="status" role="status"></div></form>
+<div class="footnote">A fictional cat, a small model, and a little room for nonsense. Replies may be delightfully imperfect.</div>
+</main></div>
+<script type="module">
+const $ = id => document.getElementById(id);
+const MODEL = 'onnx-community/SmolLM2-135M-Instruct';
+// Runs inference off the UI thread; no prompts are sent to a server.
+const workerSource = `
+import { pipeline, TextStreamer, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
+env.allowLocalModels = false;
+env.useBrowserCache = true;
+// GitHub Pages cannot set COOP/COEP headers. Single-thread WASM needs neither
+// cross-origin isolation nor SharedArrayBuffer; inference already has its own worker.
+env.backends.onnx.wasm.numThreads = 1;
+env.backends.onnx.wasm.proxy = false;
+// Keep engine binaries paired with the pinned Transformers.js bundle, independent
+// of the Pages project path and the blob worker's URL.
+env.backends.onnx.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/';
+let generator, backend;
+const files = new Map();
+const post = (type, data = {}) => self.postMessage({ type, ...data });
+function progress(event) {
+  if (event.file) {
+    const previous = files.get(event.file) || {};
+    files.set(event.file, { loaded: event.loaded ?? (event.status === 'done' ? previous.total : previous.loaded) ?? 0, total: event.total ?? previous.total ?? 0 });
+  }
+  const entries = [...files.values()];
+  post('progress', { loaded: entries.reduce((n,f)=>n+f.loaded,0), total: entries.reduce((n,f)=>n+f.total,0), file: event.file || '', stage: event.status });
+}
+async function load(device) {
+  return pipeline('text-generation', '${MODEL}', { device, dtype: 'q4', progress_callback: progress });
+}
+self.onmessage = async ({ data }) => {
+  try {
+    if (data.type === 'load') {
+      let gpu = false;
+      try { gpu = !!(self.navigator.gpu && await self.navigator.gpu.requestAdapter()); } catch {}
+      if (gpu) {
+        try { backend = 'webgpu'; generator = await load(backend); }
+        catch { post('fallback'); backend = 'wasm'; generator = await load(backend); }
+      } else { backend = 'wasm'; generator = await load(backend); }
+      post('ready', { backend });
+    } else if (data.type === 'generate') {
+      const streamer = new TextStreamer(generator.tokenizer, { skip_prompt: true, skip_special_tokens: true, callback_function: text => post('token', { text }) });
+      const output = await generator(data.messages, { max_new_tokens: 110, do_sample: true, temperature: 0.75, top_p: 0.9, repetition_penalty: 1.12, return_full_text: false, streamer });
+      const generated = output[0].generated_text;
+      const text = typeof generated === 'string' ? generated : generated[generated.length - 1].content;
+      post('complete', { text });
+    }
+  } catch (error) { post('error', { message: error.message || String(error), phase: data.type }); }
+};`;
+let worker, workerURL, ready = false, busy = false, history = [], replyNode;
+const SYSTEM = 'You are the Cheshire Cat from Alice in Wonderland. Stay in character: mischievous, warm, whimsical, and gently puzzling. Speak with curious questions, playful paradoxes, and an occasional mention of your grin. Be helpful while sounding like the Cat. Reply in just one or two short sentences. Do not introduce yourself as an AI. Do not write the visitor\'s next turn.';
+function status(message, error = false) { $('status').textContent = message; $('status').classList.toggle('error', error); }
+function addMessage(role, text) {
+  const row = document.createElement('div'); row.className = 'message ' + role;
+  const avatar = document.createElement('span'); avatar.className = 'avatar'; avatar.textContent = role === 'user' ? 'Y' : '☾'; avatar.setAttribute('aria-hidden','true');
+  const content = document.createElement('div'); content.className = 'message-content';
+  const speaker = document.createElement('div'); speaker.className = 'speaker'; speaker.textContent = role === 'user' ? 'You, the curious one' : 'The Cheshire Cat';
+  const bubble = document.createElement('div'); bubble.className = 'bubble'; bubble.textContent = text;
+  content.append(speaker,bubble); row.append(avatar,content); $('conversation').append(row); scroll(); return bubble;
+}
+function scroll() { $('conversation').scrollTop = $('conversation').scrollHeight; }
+function controls() { $('prompt').disabled = !ready || busy; $('send').disabled = !ready || busy || !$('prompt').value.trim(); $('clear').disabled = busy; }
+function fail(message, phase) {
+  busy = false;
+  if (phase === 'load') {
+    ready = false; worker?.terminate(); worker = null;
+    if(workerURL) URL.revokeObjectURL(workerURL);
+    $('download').disabled = false; $('download').textContent = '↻ Retry download'; $('progress').hidden = true;
+    $('download-status').textContent = 'Could not load the model. Check your connection and available memory. Cached files will be reused on retry.';
+  } else { if(replyNode && !replyNode.textContent) replyNode.textContent = 'The Cat has momentarily vanished. Try your thought again.'; }
+  status('Something interrupted the magic: ' + message, true); controls();
+}
+$('download').addEventListener('click', () => {
+  $('download').disabled = true; $('download').textContent = 'Inviting the Cat…'; $('progress').hidden = false; $('progress').removeAttribute('value');
+  $('download-status').textContent = 'Loading the inference engine…'; status('Keep this tab open while the model arrives.');
+  try {
+    workerURL = URL.createObjectURL(new Blob([workerSource], {type:'text/javascript'}));
+    worker = new Worker(workerURL, {type:'module'});
+    worker.onerror = event => fail(event.message || 'The inference worker could not start.', 'load');
+    worker.onmessage = ({data}) => {
+      if (data.type === 'progress') {
+        if (data.total) { $('progress').value = Math.min(99, data.loaded / data.total * 100); $('download-status').textContent = (data.loaded/1e6).toFixed(1) + ' / ' + (data.total/1e6).toFixed(1) + ' MB · ' + (data.stage === 'done' ? 'Preparing model…' : 'Loading model files…'); }
+      } else if (data.type === 'fallback') { $('download-status').textContent = 'WebGPU unavailable. Preparing the CPU (WASM) fallback…'; }
+      else if (data.type === 'ready') {
+        ready = true; $('progress').value = 100; $('download').textContent = '✓ The Cat is here'; $('download-status').textContent = 'Ready · ' + (data.backend === 'webgpu' ? 'WebGPU acceleration' : 'WASM · CPU mode');
+        $('device').textContent = 'ON-DEVICE · ' + data.backend.toUpperCase(); $('prompt').placeholder = 'Ask something curious…'; status('The Cat is ready. Where shall we wander?'); controls(); $('prompt').focus();
+      } else if (data.type === 'token') { replyNode.textContent += data.text; scroll(); }
+      else if (data.type === 'complete') {
+        replyNode.textContent = data.text.trim() || 'Even my grin is at a loss for words. Shall we try another path?';
+        history.push({role:'assistant',content:replyNode.textContent.slice(0,600)});
+        history = history.slice(-4); busy = false; status('Only the last two exchanges are remembered.'); controls(); $('prompt').focus(); scroll();
+      } else if (data.type === 'error') { if(data.phase === 'generate') history.pop(); fail(data.message,data.phase); }
+    };
+    worker.postMessage({type:'load'});
+  } catch(error) { fail(error.message,'load'); }
+});
+function submit() {
+  const text = $('prompt').value.trim(); if(!text || !ready || busy) return;
+  busy = true; $('welcome').classList.add('compact'); $('suggestions').hidden = true; $('suggestions').style.display = 'none';
+  addMessage('user',text); $('prompt').value = ''; history.push({role:'user',content:text});
+  replyNode = addMessage('assistant',''); status('The Cat is turning your thought upside down…'); controls();
+  worker.postMessage({type:'generate',messages:[{role:'system',content:SYSTEM},...history]});
+}
+$('chat-form').addEventListener('submit', event => { event.preventDefault(); submit(); });
+$('prompt').addEventListener('input',controls);
+$('prompt').addEventListener('keydown',event=>{ if(event.key==='Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); submit(); } });
+document.querySelectorAll('[data-prompt]').forEach(button=>button.addEventListener('click',()=>{ if(!ready) { status('Download the model first, then follow that thought.'); $('download').focus(); return; } $('prompt').value=button.dataset.prompt; submit(); }));
+$('clear').addEventListener('click',()=>{ if(busy) return; history=[]; $('conversation').replaceChildren(); greeting(); $('welcome').classList.remove('compact'); $('suggestions').hidden=false; $('suggestions').style.display=''; status(ready ? 'A fresh path. The Cat has forgotten the previous conversation.' : 'Download the model to begin.'); });
+function greeting() { addMessage('assistant', 'Oh, there you are. I was beginning to wonder whether you were lost, or simply taking the interesting way. What brings you to this part of nowhere?'); }
+greeting(); controls();
+</script>
+</body>
+</html>
