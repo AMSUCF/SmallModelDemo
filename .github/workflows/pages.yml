@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Verify public model assets
+        run: python3 tests/check_model.py
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Stage public files

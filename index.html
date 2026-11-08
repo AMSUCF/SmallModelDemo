@@ -36,7 +36,7 @@
 </main></div>
 <script type="module">
 const $ = id => document.getElementById(id);
-const MODEL = 'onnx-community/SmolLM2-135M-Instruct';
+const MODEL = 'HuggingFaceTB/SmolLM2-135M-Instruct';
 // Runs inference off the UI thread; no prompts are sent to a server.
 const workerSource = `
 import { pipeline, TextStreamer, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1';
@@ -70,7 +70,12 @@ self.onmessage = async ({ data }) => {
       try { gpu = !!(self.navigator.gpu && await self.navigator.gpu.requestAdapter()); } catch {}
       if (gpu) {
         try { backend = 'webgpu'; generator = await load(backend); }
-        catch { post('fallback'); backend = 'wasm'; generator = await load(backend); }
+        catch (error) {
+          // Authentication and missing-file errors are independent of the device.
+          // Retrying the same inaccessible assets on WASM only hides the cause.
+          if (/Unauthorized access|Forbidden access|Could not locate file/i.test(error.message)) throw error;
+          post('fallback'); backend = 'wasm'; generator = await load(backend);
+        }
       } else { backend = 'wasm'; generator = await load(backend); }
       post('ready', { backend });
     } else if (data.type === 'generate') {

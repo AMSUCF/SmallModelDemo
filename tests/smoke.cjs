@@ -8,6 +8,7 @@ const mockModule = `
 export const env = { backends: { onnx: { wasm: {} } } };
 export class TextStreamer { constructor(tokenizer, options) { this.options = options; } }
 export async function pipeline(task, model, options) {
+  if (model !== 'HuggingFaceTB/SmolLM2-135M-Instruct') throw Error('Use the official public model repository');
   if (env.backends.onnx.wasm.numThreads !== 1 || env.backends.onnx.wasm.proxy !== false) throw Error('WASM needs isolation headers');
   if (env.backends.onnx.wasm.wasmPaths !== 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/') throw Error('Runtime assets must use the pinned CDN path');
   if (options.dtype !== 'q4') throw Error('Wrong precision');
@@ -36,7 +37,7 @@ export async function pipeline(task, model, options) {
   assert.match(html, /The Cheshire Room/);
   const browser = await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined,headless:true,args:['--no-sandbox']});
   try {
-    for (const scenario of ["no-gpu", "gpu-failure", "gpu-success"]) {
+    for (const scenario of ["no-gpu", "gpu-failure", "gpu-success", "gpu-asset-denied"]) {
       const gpu = scenario !== "no-gpu";
       const page = await browser.newPage({viewport:{width:1440,height:1000}});
       const errors=[]; page.on('pageerror', e=>errors.push(e.message));
@@ -47,7 +48,10 @@ export async function pipeline(task, model, options) {
         source=source.replace('import { pipeline, TextStreamer, env }',`Object.defineProperty(self.navigator, 'gpu', { value: ${gpu ? '{requestAdapter:async()=>({})}' : 'undefined'} });\nimport { pipeline, TextStreamer, env }`);
         return r.fulfill({contentType:'text/html',body:source});
       });
-      await page.route(mockURL,r=>r.fulfill({contentType:'text/javascript',body:scenario === "gpu-success" ? mockModule.replace("if (options.device === 'webgpu')", "if (false)").replace("if (options.device !== 'wasm')", "if (false)") : mockModule}));
+      let library = mockModule;
+      if (scenario === 'gpu-success') library = library.replace("if (options.device === 'webgpu')", "if (false)").replace("if (options.device !== 'wasm')", "if (false)");
+      if (scenario === 'gpu-asset-denied') library = library.replace('Simulated GPU initialization failure', 'Unauthorized access to file: config.json').replace("if (options.device !== 'wasm')", "if (options.device === 'wasm')");
+      await page.route(mockURL,r=>r.fulfill({contentType:'text/javascript',body:library}));
       await page.goto(appURL);
       assert.equal(await page.evaluate(()=>crossOriginIsolated),false);
       assert.equal(await page.locator('#prompt').isDisabled(),true);
@@ -55,6 +59,15 @@ export async function pipeline(task, model, options) {
       assert.match(await page.locator('#status').textContent(),/Download/);
       await page.screenshot({path:path.join(os.tmpdir(),'cheshire-desktop.png'),fullPage:true});
       await page.click('#download');
+      if (scenario === 'gpu-asset-denied') {
+        await page.waitForFunction(()=>document.getElementById('download').textContent.includes('Retry'));
+        assert.match(await page.locator('#status').textContent(), /Unauthorized access to file/);
+        assert.equal(await page.locator('#prompt').isDisabled(), true);
+        assert.equal(await page.locator('#download').isEnabled(), true);
+        console.log('PASS: asset authorization errors preserve the cause without retrying on WASM');
+        await page.close();
+        continue;
+      }
       await page.waitForFunction(()=>!document.getElementById('prompt').disabled);
       assert.match(await page.locator('#device').textContent(),scenario === 'gpu-success' ? /WEBGPU/ : /WASM/);
       assert.equal(await page.locator('#progress').getAttribute('value'),'100');

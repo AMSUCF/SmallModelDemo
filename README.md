@@ -22,7 +22,7 @@ Model files are fetched directly from Hugging Face when a visitor chooses **Down
 
 ## Model and runtime
 
-- Recommended minimum: [`onnx-community/SmolLM2-135M-Instruct`](https://huggingface.co/onnx-community/SmolLM2-135M-Instruct), using Transformers.js 3.8.1, `dtype: q4`.
+- Recommended minimum: the official public [`HuggingFaceTB/SmolLM2-135M-Instruct`](https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct), using Transformers.js 3.8.1, `dtype: q4`. The publisher's repository includes the ONNX exports used by Transformers.js. No Hugging Face login or token is required.
 - Budget **approximately 200 MB** for the Q4 ONNX model (which includes unquantized tensors), plus tokenizer and inference runtime files. This is an estimate, not a measured transfer guarantee; the UI shows bytes reported by the actual file downloads. Cache hits may require no network transfer. Budget additional working memory for inference.
 - 135M is a practical minimum for a simple whimsical persona, not a guarantee of consistent roleplay or strong reasoning. The system prompt encourages brief, playful Cheshire Cat replies.
 - A module Web Worker probes WebGPU and tries GPU initialization first. If the adapter or GPU initialization is unavailable, it loads the same model with WASM on the CPU. CPU generation can be slow.
@@ -32,6 +32,8 @@ Model files are fetched directly from Hugging Face when a visitor chooses **Down
 Network access is needed for the pinned Transformers.js module and ONNX runtime assets at `cdn.jsdelivr.net`, model/tokenizer downloads from `huggingface.co` and its redirected asset hosts, and optional Google Fonts (`fonts.googleapis.com`, `fonts.gstatic.com`). Fonts fall back to local serif/sans fonts. No prompt or conversation is transmitted by the app. The download providers receive ordinary asset requests.
 
 ## Validation
+
+Before packaging the site, the Pages workflow runs `python3 tests/check_model.py` to check anonymous access to the configured model's configuration, tokenizer, and Q4 ONNX file. This performs metadata requests without downloading model weights. A missing, gated, or inaccessible model blocks deployment with the failing URL in the log. You can run the same check locally; it requires network access to Hugging Face and its asset hosts. This checks asset availability, not inference quality or browser compatibility.
 
 The browser smoke checks in `tests/smoke.cjs` use Playwright installed outside the checkout. Set `PLAYWRIGHT_MODULE` to the installed Playwright module path if it is not on Node's module path. By default, Playwright uses its installed Chromium; set `CHROMIUM_PATH` to use a system Chromium executable. Run the server above and execute `node tests/smoke.cjs`.
 
